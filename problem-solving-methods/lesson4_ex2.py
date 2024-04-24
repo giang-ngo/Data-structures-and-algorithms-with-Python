@@ -1,4 +1,37 @@
+# phần nâng cao của đệ quy
 # Ví dụ 2: Cho biết có bao nhiêu cách lập nên một số n >= 0 từ tập các con số {1, 3, 5}?.
+'''
+###
+=> tạo số 0: 1 cách là không chọn số nào cả.
+###
+=> tạo số 1: 1 cách là chọn 1 số 1
+###
+=> tạo số 2: 1 cách là cộng hai số 1
+###
+=> tạo số 3: 2 cách
+1 + 1 + 1
+3
+###
+=> tạo số 4: 3 cách
+1 + 1 + 1 + 1
+1 + 3
+3 + 1
+###
+=> tạo số 5: 5 cách
+1 + 1 + 1 + 1 + 1
+1 + 1 + 3
+1 + 3 + 1
+3 + 1 + 1
+5
+Nếu chọn số 1, thì còn lại n − 1 phải tạo.
+Nếu chọn số 3, thì còn lại n − 3 phải tạo.
+Nếu chọn số 5, thì còn lại n − 5 phải tạo.
+
+==> tổng số cách tạo số n = T(n - 1) + T(n - 3) + T(n - 5)
+T(5) = T(5 - 1) + T(5 - 3) + T(5 - 5)
+T(5) = T(4) + T(2) + T(0) = 3 + 1 + 1 = 5
+'''
+
 
 #  top-down strategy
 def build_n_top_down(dp: list, n: int):
