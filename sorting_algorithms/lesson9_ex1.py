@@ -22,14 +22,15 @@ def test():
 
     # cách 1: dùng list.sort()
     # tiến hành sắp xếp theo điểm gpa
-    sorted_students = sorted(students, key=lambda s: s.gpa)
-    print('==> Sau khi sắp xếp tăng dần theo điểm gpa: ')
-    show_result(sorted_students)
+    students.sort(key=lambda student: -student.gpa)
+    # students.sort(key=lambda student: student.gpa, reverse=True)
+    print('==> Sau khi sắp xếp giảm dần theo điểm gpa: ')
+    show_result(students)
 
     # cách 2: dùng hàm sorted()
     # tiến hành sắp xếp theo tên
     sorted_students = sorted(students, key=lambda s: s.first_name, reverse=True)
-    print('==> Sau khi sắp xếp giảm dần theo tên: ')
+    print('==> Sau khi sắp xếp giảm dần theo tên z-a: ')
     show_result(sorted_students)
 
 

@@ -11,7 +11,7 @@ if __name__ == '__main__':
     # trước khi sắp xếp:
     print(df)
 
-    # sắp xếp theo cột gpa:
-    df.sort_values(by=['gpa'], inplace=True)  # theo một tiêu chí
-    print('==> Sau khi sắp xếp theo cột gpa: ')
+    # sắp xếp theo cột gpa,first_name,last_name:
+    df.sort_values(by=['gpa', 'first_name', 'last_name'], inplace=True, ascending=[False, True, True])
+    print('==> Sau khi sắp xếp: ')
     print(df)
