@@ -6,13 +6,6 @@ def linear_search(arr: list, x: int) -> int:
     return -1  # không tìm thấy
 
 
-# hàm hiển thị kết quả
-def show_result(arr: list):
-    for i in range(len(arr)):
-        print(f'{arr[i]} ', end='')
-    print()
-
-
 # hàm test kết quả
 def test():
     message = 'Nhập các phần tử mảng cách nhau bằng dấu cách: '
