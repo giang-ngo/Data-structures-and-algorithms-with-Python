@@ -54,19 +54,16 @@ class CircularLinkedList:
     def remove(self) -> bool:
         if self.is_empty():  # nếu danh sách rỗng
             return False  # không có gì để xóa
-        elif self.__head == self.__tail:  # nếu danh sách chỉ có 1 node
-            r = self.__head  # lưu lại node cần xóa
-            self.__head = None  # cập nhật lại head mới
-            self.__tail = None  # cập nhật tail mới
-            del r  # xóa node r
-            return True  # trả về thông báo xóa thành công
+        # r = self.__head  # lưu lại node cần xóa
+        if self.__head.next == self.__head:  # nếu danh sách chỉ có 1 node
+            self.__head = None
+            self.__tail = None
         else:  # trường hợp danh sách có nhiều node
-            r = self.__head  # lưu lại node cần xóa
-            self.__head = self.__head.next  # cập nhật node head mới
-            self.__head.prev = self.__tail  # cập nhật prev của head mới
-            self.__tail.next = self.__head  # cập nhật next của head mới
-            del r  # xóa node r
-            return True  # trả về thông báo xóa thành công
+            self.__head = self.__head.next
+            self.__head.prev = self.__tail
+            self.__tail.next = self.__head
+        # del r  # xóa node r
+        return True  # trả về thông báo xóa thành công
 
     # phương thức dùng để kiểm tra DSLK có rỗng không
     def is_empty(self):
@@ -83,7 +80,7 @@ class CircularLinkedList:
                 p = p.next  # chuyển sang node liền trước
                 if p == self.__head:  # kết thúc một vòng
                     break  # ngắt việc duyệt
-            print()
+            print('None')
 
 
 # hàm kiểm tra việc thực thi các chức năng
