@@ -39,15 +39,13 @@ class Stack:
 
     # phương thức xóa node đầu stack
     def pop(self):
-        if self.is_empty():
-            print('==> Stack rỗng')
+        if self.__size == 0:
+            print('Stack is empty')
             return None
         else:
-            p = self.__head
-            value = p.data
+            value = self.__head.data
             self.__head = self.__head.next
             self.__size -= 1
-            del p
             return value
 
     # phương thức dùng để kiểm tra DSLK có rỗng không

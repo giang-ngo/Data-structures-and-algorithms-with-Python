@@ -1,9 +1,11 @@
-# lớp mô tả thông tin về một node của cây nhị phân tìm kiếm
-class Node:
+import sys
+
+class TreeNode:
     def __init__(self, data=None):
+        self.__data = data
         self.__left = None
         self.__right = None
-        self.__data = data
+        self.__height = 1  # Chiều cao của một node mới là 1
 
     @property
     def data(self):
@@ -29,145 +31,115 @@ class Node:
     def right(self, value):
         self.__right = value
 
+    @property
+    def height(self):
+        return self.__height
 
-class BinarySearchTree:
+    @height.setter
+    def height(self, value):
+        self.__height = value
+
+class AVLTree:
     def __init__(self):
         self.__root = None
 
-    @property
-    def root(self):
-        return self.__root
+    def insert(self, key):
+        """ Phương thức chèn thêm node vào cây AVL """
+        self.__root = self.__insert(self.__root, key)
 
-    @root.setter
-    def root(self, value):
-        self.__root = value
+    def __insert(self, root, key):
+        """ Phương thức nội tại chèn node vào cây AVL. """
+        if root is None:
+            return TreeNode(key)
 
-    def add(self, value):
-        self.root = self.__add(self.__root, value)
-
-    # phương thức add triển khai trong nội tại của BST
-    def __add(self, r, value) -> Node:
-        if r is None:  # nếu node r đang xét là None
-            return Node(value)  # tạo và trả về node mới
-        else:  # nếu r không None, tiếp tục xét
-            if value > r.data:  # nếu giá trị cần thêm vào cây lớn hơn node đang xét
-                r.right = self.__add(r.right, value)  # tiến hành chèn vào bên phải
-            else:  # ngược lại
-                r.left = self.__add(r.left, value)  # chèn bên trái node hiện thời
-            return r  # chèn node mới xong thì return để update cây
-
-    def pre_order(self):
-        self.__pre_order(self.root)
-        print()
-
-    def __pre_order(self, r):
-        if r is not None:
-            print(f'{r.data} ', end='')  # in ra giá trị node cha trước
-            self.__pre_order(r.left)  # duyệt cây con trái
-            self.__pre_order(r.right)  # duyệt cây con phải
-
-    def in_order(self):
-        self.__in_order(self.root)
-        print()
-
-    # phương thức duyệt in_order triển khai trong nội tại của BST
-    def __in_order(self, r):
-        if r is not None:
-            self.__in_order(r.left)  # duyệt cây con trái
-            print(f'{r.data} ', end='')  # in ra giá trị node cha
-            self.__in_order(r.right)  # duyệt cây con phải
-
-    def post_order(self):
-        self.__post_order(self.root)
-        print()
-
-    def __post_order(self, r):
-        if r is not None:
-            self.__post_order(r.left)  # duyệt cây con trái
-            self.__post_order(r.right)  # duyệt cây con phải
-            print(f'{r.data} ', end='')  # in ra giá trị node cha
-
-    def count_node(self):
-        """ Đếm số node có trong cây. """
-        return self.__count_node(self.root)
-
-    def __count_node(self, r):
-        """ Phương thức nội tại đếm số node hiện có trong cây BST. """
-        if r is None:
-            return 0
+        if key < root.data:
+            root.left = self.__insert(root.left, key)
         else:
-            return 1 + self.__count_node(r.left) + self.__count_node(r.right)
+            root.right = self.__insert(root.right, key)
 
-    def count_leaf_node(self):
-        """ Đếm số lượng node lá trên cây. """
-        return self.__count_leaf_node(self.root)
+        root.height = 1 + max(self.__get_height(root.left), self.__get_height(root.right))
 
-    def __count_leaf_node(self, r):
-        """ Phương thức nội tại đếm số lượng node lá trên cây. """
-        if r is None:
+        balance = self.__get_balance(root)
+
+        # Trường hợp Left Left
+        if balance > 1 and key < root.left.data:
+            return self.__right_rotate(root)
+
+        # Trường hợp Right Right
+        if balance < -1 and key > root.right.data:
+            return self.__left_rotate(root)
+
+        # Trường hợp Left Right
+        if balance > 1 and key > root.left.data:
+            root.left = self.__left_rotate(root.left)
+            return self.__right_rotate(root)
+
+        # Trường hợp Right Left
+        if balance < -1 and key < root.right.data:
+            root.right = self.__right_rotate(root.right)
+            return self.__left_rotate(root)
+
+        return root
+
+    def __left_rotate(self, z):
+        """ Thực hiện quay trái trên cây con gốc là z. """
+        y = z.right
+        T2 = y.left
+
+        y.left = z
+        z.right = T2
+
+        z.height = 1 + max(self.__get_height(z.left), self.__get_height(z.right))
+        y.height = 1 + max(self.__get_height(y.left), self.__get_height(y.right))
+
+        return y
+
+    def __right_rotate(self, z):
+        """ Thực hiện quay phải trên cây con gốc là z. """
+        y = z.left
+        T3 = y.right
+
+        y.right = z
+        z.left = T3
+
+        z.height = 1 + max(self.__get_height(z.left), self.__get_height(z.right))
+        y.height = 1 + max(self.__get_height(y.left), self.__get_height(y.right))
+
+        return y
+
+    def __get_height(self, root):
+        """ Lấy chiều cao của cây có gốc là root. """
+        if not root:
             return 0
-        # node lá là node có cây con trái và phải đều None
-        if r.left is None and r.right is None:
-            return 1
-        return self.__count_leaf_node(r.left) + self.__count_leaf_node(r.right)
+        return root.height
 
-    def __min_node(self, r):
-        """ Phương thức nội tại tìm và trả về node nhỏ nhất của cây con bên phải. """
-        while r.left is not None:
-            r = r.left
-        return r.data
+    def __get_balance(self, root):
+        """ Lấy hệ số cân bằng của cây có gốc là root. """
+        if not root:
+            return 0
+        return self.__get_height(root.left) - self.__get_height(root.right)
 
-    def remove(self, value):
-        """ Phương thức xóa node khỏi cây. """
-        self.root = self.__remove(self.root, value)
+    def print_helper(self):
+        """ In cây theo cấu trúc. """
+        self.__print_helper(self.__root, "", True)
 
-    def __remove(self, r, x):
-        """ Phương thức nội tại xóa node có giá trị x khỏi cây. """
-        if r is None:
-            print(f'==> Không tồn tại node có giá trị {x}.')
-            return None
-        if x < r.data:
-            r.left = self.__remove(r.left, x)
-        elif x > r.data:
-            r.right = self.__remove(r.right, x)
-        else:
-            if r.left is None:
-                r = r.right
-            elif r.right is None:
-                r = r.left
+    def __print_helper(self, root, indent, last):
+        """ Phương thức trợ giúp để in cây theo cấu trúc. """
+        if root:
+            sys.stdout.write(indent)
+            if last:
+                sys.stdout.write("R----")
+                indent += "     "
             else:
-                r.data = self.__min_node(r.right)
-                r.right = self.__remove(r.right, r.data)
-        return r
-
+                sys.stdout.write("L----")
+                indent += "|    "
+            print(root.data)
+            self.__print_helper(root.left, indent, False)
+            self.__print_helper(root.right, indent, True)
 
 if __name__ == '__main__':
-    tree = BinarySearchTree()
-    tree.add(80)
-    tree.add(50)
-    tree.add(100)
-    tree.add(30)
-    tree.add(40)
-    tree.add(20)
-    tree.add(90)
-    tree.add(120)
-    tree.add(95)
-    tree.add(130)
-    tree.add(110)
-    print('==> Giá trị các node khi duyệt cây LNR: ')
-    tree.in_order()
-
-    # tiến hành xóa node tồn tại và không tồn tại trên cây
-    tree.remove(20)  # node có trên cây
-    tree.remove(55)  # node không có trên cây
-    print('==> Các node trên cây sau khi xóa: ')
-    tree.in_order()
-
-# Hình ảnh cây nhị phân tìm kiếm trong ví dụ trên
-#               __80__
-#              /     \
-#            50      100
-#           /      /    \
-#         30      90    120
-#        / \       \    /  \
-#       20  40     95 110  130
+    tree = AVLTree()
+    nums = [33, 15, 52, 9, 21, 61, 8, 11, 16, 47, 5, 37, 1, 23, 12, 2]
+    for num in nums:
+        tree.insert(num)
+    tree.print_helper()

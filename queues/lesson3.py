@@ -18,50 +18,42 @@ class CircularQueue:
 
     # phương thức thêm mới phần tử vào queues
     def push(self, value) -> bool:
-        if self.is_full():  # nếu queues đầy không thể thêm mới
-            print('==> Queue đầy. Thêm thất bại.')
+        if self.is_full():
+            print('Queue is full')
             return False
-        else:
-            if self.is_empty():
-                self.__head_index = 0
-            self.__tail_index = (self.__tail_index + 1) % self.__capacity
-            self.__data[self.__tail_index] = value
-            self.__size += 1  # tăng size lên 1
-            return True
+        if self.is_empty():
+            self.__head_index = 0
+        self.__tail_index = (self.__tail_index + 1) % self.__capacity
+        self.__data[self.__tail_index] = value
+        self.__size += 1
+        return True
 
     # phương thức xóa bỏ phần tử khỏi queues
     def pop(self):
-        if self.is_empty():  # queues rỗng, không có gì để xóa
-            print('==> Queue rỗng')
+        if self.is_empty():
+            print('Queue is empty')
             return None
-        else:  # nếu queues có phần tử
-            element = self.__data[self.__head_index]  # pop phần tử ở đầu list
-            if self.__head_index == self.__tail_index:
-                self.__head_index = -1
-                self.__tail_index = -1
-            else:
-                self.__head_index = self.__head_index % self.__capacity
-                self.__head_index += 1
-            self.__size -= 1  # giảm số lượng phần tử đi 1
-            return element
+        element = self.__data[self.__head_index]
+        if self.__head_index == self.__tail_index:
+            self.__head_index = self.__tail_index = -1
+        else:
+            self.__head_index = (self.__head_index + 1) % self.__capacity
+        self.__size -= 1
+        return element
 
     # phương thức lấy ra phần tử ở đầu queues
     def front(self):
         if self.is_empty():
-            print('==> Queue rỗng')
+            print('Queue is empty')
             return None
-        else:
-            element = self.__data[self.__head_index]
-            return element
+        return self.__data[self.__head_index]
 
     # phương thức lấy ra phần tử ở cuối queues
     def back(self):
         if self.is_empty():
-            print('==> Queue rỗng')
+            print('Queue is empty')
             return None
-        else:
-            element = self.__data[self.__tail_index]
-            return element
+        return self.__data[self.__tail_index]
 
     # phương thức trả về kích thước hiện thời
     def size(self):
@@ -78,13 +70,13 @@ class CircularQueue:
     # phương thức hiển thị các phần tử trong queues
     def show_elements(self):
         if self.is_empty():
-            print('==> Queue rỗng')
-        else:
-            index = self.__head_index
-            while index != self.__tail_index:
-                print(f'{self.__data[index]} -> ')
-                index = (index + 1) % self.__capacity
-            print(self.__data[self.__tail_index])
+            print('Queue is empty')
+            return
+        index = self.__head_index
+        while index != self.__tail_index:
+            print(f'{self.__data[index]} -> ')
+            index = (index + 1) % self.__capacity
+        print(self.__data[self.__tail_index])
 
 
 # hàm test các chức năng

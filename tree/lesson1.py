@@ -43,28 +43,42 @@ class BinarySearchTree:
         self.__root = value
 
     def add(self, value):
-        self.root = self.__add(self.__root, value)
+        self.__root = self.__add(self.__root, value)
 
-    # phương thức add triển khai trong nội tại của BST
-    def __add(self, r, value) -> Node:
-        if r is None:  # nếu node r đang xét là None
-            return Node(value)  # tạo và trả về node mới
-        else:  # nếu r không None, tiếp tục xét
-            if value > r.data:  # nếu giá trị cần thêm vào cây lớn hơn node đang xét
-                r.right = self.__add(r.right, value)  # tiến hành chèn vào bên phải
-            else:  # ngược lại
-                r.left = self.__add(r.left, value)  # chèn bên trái node hiện thời
-            return r  # chèn node mới xong thì return để update cây
+    def __add(self, node, value):
+        if node is None:
+            return Node(value)
+        if value >= node.data:
+            node.right = self.__add(node.right, value)
+        else:
+            node.left = self.__add(node.left, value)
+        return node
 
     def in_order(self):
-        self.__in_order(self.root)
+        self.__in_order(self.__root)
+        print()
 
-    # phương thức duyệt in_order triển khai trong nội tại của BST
-    def __in_order(self, r):
-        if r is not None:
-            self.__in_order(r.left)  # tìm node trái cùng của nhánh hiện tại
-            print(f'{r.data} ', end='')  # in ra giá trị
-            self.__in_order(r.right)  # chuyển sang node phải cùng của nhánh hiện tại
+    def __in_order(self, node):
+        if node:
+            self.__in_order(node.left)
+            print(f'{node.data} ', end='')
+            self.__in_order(node.right)
+
+    def display_tree(self):
+        if self.__root is None:
+            print("Empty Tree")
+            return
+        self.__display_tree(self.__root, 0, False, "")
+
+    def __display_tree(self, node, level, is_last, prefix):
+        if node is not None:
+            print(prefix, "`- " if is_last else "|- ", node.data, sep="")
+            prefix += "   " if is_last else "|  "
+            child_count = (node.left is not None) + (node.right is not None)
+            if node.left:
+                self.__display_tree(node.left, level + 1, child_count == 1, prefix)
+            if node.right:
+                self.__display_tree(node.right, level + 1, True, prefix)
 
 
 if __name__ == '__main__':
@@ -80,10 +94,12 @@ if __name__ == '__main__':
     tree.add(95)
     tree.add(130)
     tree.add(110)
+
     print('==> Giá trị các node trong cây: ')
     tree.in_order()
+    print('\nCấu trúc cây nhị phân:')
+    tree.display_tree()
 
-#  hình ảnh cây nhị phân tìm kiếm trong ví dụ trên
 #  hình ảnh cây nhị phân tìm kiếm trong ví dụ trên
 # 		        __80__
 # 	           /     \

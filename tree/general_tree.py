@@ -1,3 +1,4 @@
+# ** tính ứng dụng ít, dừng lại ở mức tìm hiều cơ bản
 class Node:
     """ Lớp mô tả thông tin một node. """
 
@@ -39,38 +40,50 @@ class Tree:
         self.__root = self.__insert(self.__root, value, parent_value)
 
     def __insert(self, parent_node, data, parent_value):
-        """ Phương thức thêm node con mới vào node cha được chỉ định. """
-        if parent_node is None:  # TH cây rỗng
+        """ Thêm node con mới vào node cha được chỉ định. """
+        if parent_node is None:
             return Node(data)
-        else:  # TH node đang xét khác None
-            if parent_node.data == parent_value:  # nếu node đang xét chính là node cha
-                parent_node.child.append(Node(data))  # bổ sung node con vào cho nó
-            else:  # nếu node đang xét có các node con, tiếp tục đệ quy xét các node con
-                number_of_child = len(parent_node.child)
-                if number_of_child > 0:
-                    for index in range(number_of_child):
-                        self.__insert(parent_node.child[index], data, parent_value)
-            return parent_node
+
+        if parent_node.data == parent_value:
+            parent_node.child.append(Node(data))
+        else:
+            for child in parent_node.child:
+                self.__insert(child, data, parent_value)
+
+        return parent_node
 
     def traversal(self):
-        """ Phương thức hiển thị các phần tử trên cây tổng quát. """
-        self.__traversal(self.__root)
+        """ Hiển thị các phần tử trên cây tổng quát. """
+        if self.__root is None:
+            print('==> Cây rỗng! <==')
+        else:
+            self.__traversal(self.__root)
 
     def __traversal(self, r):
-        """ Phương thức hiển thị nội tại của cây theo từng level. """
-        if r is None:
-            print('==> Cây rỗng! <==')
-            return
+        """ Hiển thị nội tại của cây theo từng level. """
         q = [r]  # tạo queue với phần tử gốc
-        while len(q) > 0:
-            n = len(q)
-            while n > 0:
-                p = q.pop(0)
-                print(f'{p.data} ', end='')
-                for i in range(len(p.child)):
-                    q.append(p.child[i])
-                n -= 1
-            print()  # in xuống dòng
+        while q:
+            level_nodes = []
+            for _ in range(len(q)):
+                node = q.pop(0)
+                level_nodes.append(node.data)
+                q.extend(node.child)
+            print(" ".join(map(str, level_nodes)))  # in các phần tử trên cùng một level
+
+    def display_tree(self):
+        if self.__root is None:
+            print("Empty Tree")
+            return
+        self.__display_tree(self.__root, "")
+
+    def __display_tree(self, node, prefix):
+        if node:
+            print(prefix + "`- " + str(node.data))
+            prefix += "   "
+            for i, child in enumerate(node.child):
+                is_last_child = (i == len(node.child) - 1)
+                child_prefix = prefix if is_last_child else prefix + "|  "
+                self.__display_tree(child, child_prefix)
 
 
 # hàm main
@@ -92,6 +105,8 @@ if __name__ == '__main__':
 
     print('==> Các phần tử trong cây tổng quát: ')
     tree.traversal()
+    print('==> Hiển thị cây theo dạng cấu trúc: ')
+    tree.display_tree()
 
 # mô tả cây:
 '''
@@ -99,7 +114,7 @@ if __name__ == '__main__':
              /   /     |     |
             20  34     56    100
            / |         |    / | |
-          77 88      111 77  85 99
-                      / |         |
-                    510 241      634
+          77 88      111  77  85 99
+                    / |          |
+                  510 241       634
 '''

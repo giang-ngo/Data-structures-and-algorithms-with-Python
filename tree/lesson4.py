@@ -58,6 +58,7 @@ class BinarySearchTree:
 
     def pre_order(self):
         self.__pre_order(self.root)
+        print()
 
     def __pre_order(self, r):
         if r is not None:
@@ -67,6 +68,7 @@ class BinarySearchTree:
 
     def in_order(self):
         self.__in_order(self.root)
+        print()
 
     # phương thức duyệt in_order triển khai trong nội tại của BST
     def __in_order(self, r):
@@ -77,6 +79,7 @@ class BinarySearchTree:
 
     def post_order(self):
         self.__post_order(self.root)
+        print()
 
     def __post_order(self, r):
         if r is not None:
@@ -108,6 +111,36 @@ class BinarySearchTree:
             return 1
         return self.__count_leaf_node(r.left) + self.__count_leaf_node(r.right)
 
+    def __min_node(self, root):
+        current = root
+        while current.left is not None:
+            current = current.left
+        return current.data
+
+    def remove(self, value):
+        self.__root = self.__remove(self.__root, value)
+
+    def __remove(self, root, value):
+        if not root:
+            print(f"Không tồn tại node có giá trị {value}")
+            return None
+
+        if value < root.data:
+            root.left = self.__remove(root.left, value)
+        elif value > root.data:
+            root.right = self.__remove(root.right, value)
+        else:
+            if not root.left:
+                return root.right
+            if not root.right:
+                return root.left
+
+            min_value = self.__min_node(root.right)
+            root.data = min_value
+            root.right = self.__remove(root.right, min_value)
+
+        return root
+
 
 if __name__ == '__main__':
     tree = BinarySearchTree()
@@ -124,14 +157,14 @@ if __name__ == '__main__':
     tree.add(110)
     print('==> Giá trị các node khi duyệt cây LNR: ')
     tree.in_order()
-    print('\n==> Giá trị các node khi duyệt cây NLR: ')
-    tree.pre_order()
-    print('\n==> Giá trị các node khi duyệt cây LRN: ')
-    tree.post_order()
-    print(f'\n==> Số lượng node lá trên cây: {tree.count_leaf_node()}')
-    print(f'==> Tổng số node trên cây: {tree.count_node()}')
 
-# hình ảnh cây nhị phân tìm kiếm trong ví dụ trên:
+    # tiến hành xóa node tồn tại và không tồn tại trên cây
+    tree.remove(20)  # node có trên cây
+    tree.remove(55)  # node không có trên cây
+    print('==> Các node trên cây sau khi xóa: ')
+    tree.in_order()
+
+# Hình ảnh cây nhị phân tìm kiếm trong ví dụ trên
 #               __80__
 #              /     \
 #            50      100

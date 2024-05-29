@@ -84,6 +84,30 @@ class BinarySearchTree:
             self.__post_order(r.right)  # duyệt cây con phải
             print(f'{r.data} ', end='')  # in ra giá trị node cha
 
+    def count_node(self):
+        """ Đếm số node có trong cây. """
+        return self.__count_node(self.root)
+
+    def __count_node(self, r):
+        """ Phương thức nội tại đếm số node hiện có trong cây BST. """
+        if r is None:
+            return 0
+        else:
+            return 1 + self.__count_node(r.left) + self.__count_node(r.right)
+
+    def count_leaf_node(self):
+        """ Đếm số lượng node lá trên cây. """
+        return self.__count_leaf_node(self.root)
+
+    def __count_leaf_node(self, r):
+        """ Phương thức nội tại đếm số lượng node lá trên cây. """
+        if r is None:
+            return 0
+        # node lá là node có cây con trái và phải đều None
+        if r.left is None and r.right is None:
+            return 1
+        return self.__count_leaf_node(r.left) + self.__count_leaf_node(r.right)
+
 
 if __name__ == '__main__':
     tree = BinarySearchTree()
@@ -104,10 +128,12 @@ if __name__ == '__main__':
     tree.pre_order()
     print('\n==> Giá trị các node khi duyệt cây LRN: ')
     tree.post_order()
+    print(f'\n==> Số lượng node lá trên cây: {tree.count_leaf_node()}')
+    print(f'==> Tổng số node trên cây: {tree.count_node()}')
 
-#  hình ảnh cây nhị phân tìm kiếm trong ví dụ trên
-# 			    __80__
-# 			   /     \
+# hình ảnh cây nhị phân tìm kiếm trong ví dụ trên:
+#               __80__
+#              /     \
 #            50      100
 #           /      /    \
 #         30      90    120

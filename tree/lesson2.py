@@ -58,6 +58,7 @@ class BinarySearchTree:
 
     def pre_order(self):
         self.__pre_order(self.root)
+        print()
 
     def __pre_order(self, r):
         if r is not None:
@@ -67,6 +68,7 @@ class BinarySearchTree:
 
     def in_order(self):
         self.__in_order(self.root)
+        print()
 
     # phương thức duyệt in_order triển khai trong nội tại của BST
     def __in_order(self, r):
@@ -77,12 +79,23 @@ class BinarySearchTree:
 
     def post_order(self):
         self.__post_order(self.root)
+        print()
 
     def __post_order(self, r):
         if r is not None:
             self.__post_order(r.left)  # duyệt cây con trái
             self.__post_order(r.right)  # duyệt cây con phải
             print(f'{r.data} ', end='')  # in ra giá trị node cha
+
+
+def print_tree(node, level=0, prefix='Root: '):
+    if node:
+        print(' ' * (level * 4) + prefix + str(node.data))
+        if node.left or node.right:
+            if node.left:
+                print_tree(node.left, level + 1, 'L--- ')
+            if node.right:
+                print_tree(node.right, level + 1, 'R--- ')
 
 
 if __name__ == '__main__':
@@ -98,16 +111,24 @@ if __name__ == '__main__':
     tree.add(95)
     tree.add(130)
     tree.add(110)
+    # Left(L): Duyệt cây con bên trái.
+    # Node(N): Truy cập nút gốc.
+    # Right(R): Duyệt cây con bên phải.
     print('==> Giá trị các node khi duyệt cây LNR: ')
     tree.in_order()
+    print_tree(tree.root)
+
     print('\n==> Giá trị các node khi duyệt cây NLR: ')
     tree.pre_order()
+    print_tree(tree.root)
+
     print('\n==> Giá trị các node khi duyệt cây LRN: ')
     tree.post_order()
+    print_tree(tree.root)
 
 #  hình ảnh cây nhị phân tìm kiếm trong ví dụ trên
-# 	             __80__
-# 	            /     \
+# 			    __80__
+# 			   /     \
 #            50      100
 #           /      /    \
 #         30      90    120

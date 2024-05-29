@@ -6,7 +6,7 @@ class TreeNode:
         self.__data = data
         self.__left = None
         self.__right = None
-        self.__height = 0
+        self.__height = 1
 
     @property
     def data(self):
@@ -42,119 +42,173 @@ class TreeNode:
 
 
 class AVLTree:
+    """ Lớp mô tả thông tin và thực hiện các thao tác trên cây AVL. """
+
     def __init__(self):
         self.__root = None
 
-    def get_height(self, root):
-        if root is None:
+    def get_height(self, node):
+        if not node:
             return 0
-        left_child_height = self.get_height(root.left)
-        right_child_height = self.get_height(root.right)
-        return 1 + max(left_child_height, right_child_height)
+        return node.height
 
-    def get_balance(self, root):
-        if root is None:
+    def update_height(self, node):
+        if node:
+            node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
+
+    def get_balance(self, node):
+        """ Phương thức lấy hệ số cân bằng của một node. """
+        if not node:
             return 0
-        return self.get_height(root.left) - self.get_height(root.right)
+        return self.get_height(node.left) - self.get_height(node.right)
 
-    def min_node(self, root):
-        if root is None or root.left is None:
-            return root
-        return self.min_node(root.left)
+    def min_node(self, node):
+        current = node
+        while current.left:
+            current = current.left
+        return current
 
     def pre_order(self):
         self.__pre_order(self.__root)
 
-    def __pre_order(self, root):
-        if root is None:
+    def __pre_order(self, node):
+        if not node:
             return
-        print(f'{root.data} ', end='')
-        self.__pre_order(root.left)
-        self.__pre_order(root.right)
+        print(f'{node.data} ', end='')
+        self.__pre_order(node.left)
+        self.__pre_order(node.right)
 
-    def left_rotate(self, z):  # xoay RR
+    def left_rotate(self, z):
         y = z.right
-        t2 = y.left
+        T2 = y.left
         y.left = z
-        z.right = t2
-        z.height = self.get_height(z)
-        y.height = self.get_height(y)
+        z.right = T2
+        self.update_height(z)
+        self.update_height(y)
         return y
 
-    def right_rotate(self, z):  # xoay LL
+    def right_rotate(self, z):
         y = z.left
-        t3 = y.right
+        T3 = y.right
         y.right = z
-        z.left = t3
-        z.height = self.get_height(z)
-        y.height = self.get_height(y)
+        z.left = T3
+        self.update_height(z)
+        self.update_height(y)
         return y
 
     def insert(self, key):
         """ Phương thức chèn thêm node vào cây AVL. """
         self.__root = self.__insert(self.__root, key)
 
-    def __insert(self, root, key):
+    def __insert(self, node, key):
         """ Phương thức nội tại chèn node vào cây AVL. """
-        if root is None:
+        if not node:
             return TreeNode(key)
-        elif key < root.data:
-            root.left = self.__insert(root.left, key)
+        elif key < node.data:
+            node.left = self.__insert(node.left, key)
         else:
-            root.right = self.__insert(root.right, key)
-        root.height = self.get_height(root)
-        # cập nhật nhân tố cân bằng và tái cân bằng cây
-        balance_factor = self.get_balance(root)
-        if balance_factor > 1:
-            if key < root.left.data:  # xoay LL
-                return self.right_rotate(root)
-            else:  # xoay LR
-                root.left = self.left_rotate(root.left)  # RR
-                return self.right_rotate(root)  # LL
-        if balance_factor < -1:
-            if key > root.right.data:  # xoay RR
-                return self.left_rotate(root)
-            else:  # xoay RL
-                root.right = self.right_rotate(root.right)  # LL
-                return self.left_rotate(root)  # RR
-        return root
+            node.right = self.__insert(node.right, key)
 
-    # Print the tree
-    def print_helper(self):
-        self.__print_helper(self.__root, '', last=True)
+        self.update_height(node)
+        balance = self.get_balance(node)
 
-    def __print_helper(self, root, indent, last):
-        if root is not None:
-            sys.stdout.write(indent)
-            if root == self.__root:
-                sys.stdout.write(indent)
+        if balance > 1:
+            if key < node.left.data:
+                return self.right_rotate(node)
             else:
-                if last:
-                    sys.stdout.write("L--")
-                    indent += "   "
-                else:
-                    sys.stdout.write("R--")
-                    indent += "|  "
-            print(root.data)
-            self.__print_helper(root.right, indent, False)
-            self.__print_helper(root.left, indent, True)
+                node.left = self.left_rotate(node.left)
+                return self.right_rotate(node)
+
+        if balance < -1:
+            if key > node.right.data:
+                return self.left_rotate(node)
+            else:
+                node.right = self.right_rotate(node.right)
+                return self.left_rotate(node)
+
+        return node
+
+    def remove(self, key):
+        """ Phương thức xóa bỏ một node khỏi cây cân bằng. """
+        self.__root = self.__remove(self.__root, key)
+
+    def __remove(self, node, key):
+        """ Phương thức nội tại xóa node khỏi cây AVL. """
+        if not node:
+            return node
+
+        if key < node.data:
+            node.left = self.__remove(node.left, key)
+        elif key > node.data:
+            node.right = self.__remove(node.right, key)
+        else:
+            if not node.left:
+                return node.right
+            elif not node.right:
+                return node.left
+
+            temp = self.min_node(node.right)
+            node.data = temp.data
+            node.right = self.__remove(node.right, temp.data)
+
+        if not node:
+            return node
+
+        self.update_height(node)
+        balance = self.get_balance(node)
+
+        if balance > 1:
+            if self.get_balance(node.left) >= 0:
+                return self.right_rotate(node)
+            else:
+                node.left = self.left_rotate(node.left)
+                return self.right_rotate(node)
+
+        if balance < -1:
+            if self.get_balance(node.right) <= 0:
+                return self.left_rotate(node)
+            else:
+                node.right = self.right_rotate(node.right)
+                return self.left_rotate(node)
+
+        return node
+
+    def print_helper(self):
+        if not self.__root:
+            print('==> Cây rỗng. <==')
+        else:
+            self.__print_helper(self.__root, '', True)
+
+    def __print_helper(self, node, indent, last):
+        if node:
+            sys.stdout.write(indent)
+            if last:
+                sys.stdout.write("L--")
+                indent += "   "
+            else:
+                sys.stdout.write("R--")
+                indent += "|  "
+            print(node.data)
+            self.__print_helper(node.left, indent, False)
+            self.__print_helper(node.right, indent, True)
 
 
 if __name__ == '__main__':
     tree = AVLTree()
-    nums = [33, 15, 52, 9, 21, 61, 8, 11, 16, 47, 5, 37, 1, 23, 12, 2]
+    nums = [33, 13, 53, 11, 21, 61, 8, 9]
     for num in nums:
         tree.insert(num)
-    # in ra các node:
+    print('==> Cây AVL ban đầu: ')
     tree.print_helper()
 
-    # Minh họa trên hình vẽ biểu diễn:
-    #               ___15___
-    #              /        \
-    #             9          33
-    #           /   \       /   \
-    #          5    11     21   52
-    #         /\     \     /\   / \
-    #        1  8    12  16 23 47  61
-    #         \               /
-    #          2             37
+    # Xóa bỏ node có giá trị 13
+    x = 13
+    tree.remove(x)
+    print(f'==> Cây AVL sau khi xóa node {x}: ')
+    tree.print_helper()
+
+    # Xóa bỏ node có giá trị 33
+    x = 33
+    tree.remove(x)
+    print(f'==> Cây AVL sau khi xóa node {x}: ')
+    tree.print_helper()
