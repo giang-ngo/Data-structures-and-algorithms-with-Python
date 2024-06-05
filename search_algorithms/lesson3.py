@@ -145,15 +145,11 @@ class BinarySearchTree:
         return self.__search(self.root, key)
 
     def __search(self, r: Node, key):
-        """ Phương thức tìm kiếm nội tại trong lớp BST. """
-        if r is None:  # nếu node đang xét là None
-            return None  # không có kết quả tìm kiếm
-        if r.data == key:  # nếu tìm thấy
-            return r.data  # trả về giá trị node cần tìm
-        if key < r.data:  # nếu node cần tìm nhỏ hơn node hiện tại
-            return self.__search(r.left, key)  # tìm bên cây con trái của nó
-        else:  # ngược lại, nếu node cần tìm lớn hơn node hiện tại
-            return self.__search(r.right, key)  # tìm ở cây con bên phải
+        if r is None or r.data == key:
+            return r
+        if key < r.data:
+            return self.__search(r.left, key)
+        return self.__search(r.right, key)
 
 
 def search_result(tree: BinarySearchTree, key):
