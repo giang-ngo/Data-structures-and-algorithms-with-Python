@@ -29,9 +29,7 @@ class HashTable:
 
     def __init__(self, capacity=10):
         """Hàm khởi tạo."""
-        if capacity <= 0:
-            capacity = 10
-        self.capacity = capacity
+        self.capacity = max(1, capacity)
         self.table = [[] for _ in range(self.capacity)]
         self.MAX_SIZE = sys.maxsize - 8
         self._load_factor = 0.75
@@ -55,34 +53,36 @@ class HashTable:
 
     def update(self, key, new_value):
         """Phương thức cập nhật một phần tử nào đó trong bảng băm."""
-        entry = Entry(key, new_value)
-        index = self.hash_code(entry.hash)
+        index = self.hash_code(Entry(key).hash)
         for element in self.table[index]:
-            if element.hash == entry.hash:
+            if element.key == key:
                 element.value = new_value
                 return True
         return False
 
     def rehash(self):
         """Phương thức băm lại bảng băm."""
-        old_capacity = self.capacity
         old_table = self.table
-        new_capacity = (old_capacity << 1) + 1
-        if new_capacity - self.MAX_SIZE > 0:
-            if old_capacity >= self.MAX_SIZE:
-                return
+        new_capacity = (self.capacity << 1) + 1
+        if new_capacity > self.MAX_SIZE:
             new_capacity = self.MAX_SIZE
 
-        new_table = [[] for _ in range(new_capacity)]
-        self.__mod_count += 1
-        self.__threshold = min(int(new_capacity * self._load_factor), self.MAX_SIZE + 1)
-        self.table = new_table
         self.capacity = new_capacity
+        self.table = [[] for _ in range(new_capacity)]
+        self.__threshold = int(new_capacity * self._load_factor)
+        self.__count = 0
 
         for bucket in old_table:
-            for element in bucket:
-                index = self.hash_code(element.hash)
-                self.table[index].append(element)
+            for entry in bucket:
+                self.insert(entry.key, entry.value)
+        self.__mod_count += 1
+
+    def keys(self):
+        result = []
+        for i in range(self.capacity):
+            for item in self.table[i]:
+                result.append(item.key)
+        return result
 
     def display(self):
         """Phương thức hiển thị các phần tử trong bảng băm."""
@@ -95,17 +95,10 @@ class HashTable:
 
 if __name__ == '__main__':
     hash_table = HashTable(8)
-    hash_table.insert("Hello", "Xin chào")
-    hash_table.insert('Love', 'Yêu thương')
-    hash_table.insert('Baby', 'Em bé')
-    hash_table.insert('Mother', 'Mẹ')
-    hash_table.insert('Lovely', 'Đáng yêu')
-
-    # hiển thị bảng băm
-    print('==> Thông tin trong bảng băm trước băm lại: ')
-    hash_table.display()
-
-    # tiến hành thêm phần tử mới:
+    initial_entries = [
+        ("Hello", "Xin chào"), ('Love', 'Yêu thương'), ('Baby', 'Em bé'),
+        ('Mother', 'Mẹ'), ('Lovely', 'Đáng yêu')
+    ]
     new_entries = [
         ('Ugly', 'Xấu xí'), ('Ok', 'Tốt'), ('Chicken', 'Con gà'),
         ('Kitty', 'Mèo con'), ('Piggy', 'Heo con'), ('Puppy', 'Cún con'),
@@ -115,9 +108,14 @@ if __name__ == '__main__':
         ('Freeze', 'Đóng băng')
     ]
 
+    for key, value in initial_entries:
+        hash_table.insert(key, value)
+
+    print('==> Thông tin trong bảng băm trước băm lại: ')
+    hash_table.display()
+
     for key, value in new_entries:
         hash_table.insert(key, value)
 
-    # hiển thị bảng băm
     print('==> Thông tin trong bảng băm sau băm lại: ')
     hash_table.display()
